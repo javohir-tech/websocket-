@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 
 # //////////////////////// Serializers ///////////////////////////
-from .serializers import SingUpSerializer, SingInSerializer , LogoutSerialzer
+from .serializers import SingUpSerializer, SingInSerializer, LogoutSerialzer
 
 
 class SingUpView(generics.CreateAPIView):
@@ -39,29 +39,28 @@ class SingInView(APIView):
                     "username": user.username,
                     "last_login": user.last_login,
                     "created": user.created,
-                    "tokens ": {
-                        "access": str(tokens.get("access_token")),
+                    "email": user.email,
+                    "tokens": {
+                        "access_token": str(tokens.get("access_token")),
                         "refresh_token": str(tokens.get("refresh_token")),
                     },
                 },
             },
-            status=status.HTTP_200_OK,  
+            status=status.HTTP_200_OK,
         )
-        
+
+
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
-    
-    def post(self , request):
-        serializer = LogoutSerialzer(data = request.data)
-        
+
+    def post(self, request):
+        serializer = LogoutSerialzer(data=request.data)
+
         serializer.is_valid(raise_exception=True)
-        refresh = serializer.validated_data.get('refresh')
+        refresh = serializer.validated_data.get("refresh")
         token = RefreshToken(refresh)
         token.blacklist()
-        return Response({
-            "success" : True , 
-            "message" : "you are success logout"
-        })
+        return Response({"success": True, "message": "you are success logout"})
 
 
 # Create your views here.
