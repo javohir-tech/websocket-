@@ -15,38 +15,19 @@
       <form @submit.prevent="handleSignUp" class="auth-form" autocomplete="off">
         <div class="field">
           <label for="name">Ism</label>
-          <input
-            id="name"
-            v-model="form.name"
-            type="text"
-            placeholder="Ismingiz"
-            autocomplete="off"
-            required
-          />
+          <input id="name" v-model="form.username" type="text" placeholder="Ismingiz" autocomplete="off" required />
         </div>
 
         <div class="field">
           <label for="email">Email</label>
-          <input
-            id="email"
-            v-model="form.email"
-            type="email"
-            placeholder="email@example.com"
-            autocomplete="off"
-            required
-          />
+          <input id="email" v-model="form.email" type="email" placeholder="email@example.com" autocomplete="off"
+            required />
         </div>
 
         <div class="field">
           <label for="password">Parol</label>
-          <input
-            id="password"
-            v-model="form.password"
-            :type="showPass ? 'text' : 'password'"
-            placeholder="Kamida 6 ta belgi"
-            autocomplete="new-password"
-            required
-          />
+          <input id="password" v-model="form.password" :type="showPass ? 'text' : 'password'"
+            placeholder="Kamida 6 ta belgi" autocomplete="new-password" required />
           <button type="button" class="eye-btn" @click="showPass = !showPass">
             {{ showPass ? '🙈' : '👁️' }}
           </button>
@@ -70,9 +51,11 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import api from "../utils/axios"
+import { toast } from 'vue3-toastify';
 
 const router = useRouter()
-const form = reactive({ name: '', email: '', password: '' })
+const form = reactive({ username: '', email: '', password: '' })
 const showPass = ref(false)
 const loading = ref(false)
 const errorMsg = ref('')
@@ -81,11 +64,15 @@ const handleSignUp = async () => {
   errorMsg.value = ''
   loading.value = true
   try {
-    // === API logikangizni shu yerga yozing ===
-    // const res = await authService.signUp(form)
-    // router.push('/chat')
-    console.log('SignUp data:', form)
+    const { data } = await api.post("/auth/singup/", form)
+
+    localStorage.setItem('username', data.username)
+    localStorage.setItem('email', data.email)
+    localStorage.setItem("access_token", data.tokens.access_token)
+    localStorage.setItem("refresh_token", data.tokens.refresh_token)
+    router.push("/")
   } catch (err) {
+    console.log(err.response)
     errorMsg.value = err?.message || 'Xatolik yuz berdi'
   } finally {
     loading.value = false

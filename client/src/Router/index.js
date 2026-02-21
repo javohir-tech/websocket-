@@ -6,7 +6,7 @@ import { SingIn, SingUp } from "../auth"
 import { Chat, Home } from "../Views"
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.API_URL),
+    history: createWebHistory(),
     routes: [
         {
             path: "/",
