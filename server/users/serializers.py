@@ -46,3 +46,7 @@ class SingInSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return user
+
+
+class LogoutSerialzer(serializers.Serializer):
+    refresh = serializers.CharField(required=True)
