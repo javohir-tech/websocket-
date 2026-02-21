@@ -1,8 +1,9 @@
 from django.urls import path
 
 # //////////////////// VIEWS /////////////////////
-from .views import singUpView
+from .views import SingUpView, SingInView
 
 urlpatterns = [
-    path("singup/", singUpView.as_view()),
+    path("singup/", SingUpView.as_view()),
+    path("singin/", SingInView.as_view()),
 ]
