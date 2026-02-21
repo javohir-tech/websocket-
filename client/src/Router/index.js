@@ -3,6 +3,7 @@ import MainLayout from "../Layout/mainLayout.vue"
 
 /////////////////// Auth //////////////////
 import { SingIn, SingUp } from "../auth"
+import { Chat, Home } from "../Views"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.API_URL),
@@ -19,8 +20,16 @@ const router = createRouter({
                 {
                     path: "singin",
                     component: SingIn
-                }
+                },
                 ////// views ///////
+                {
+                    path: "",
+                    component: Home
+                },
+                {
+                    path: "chat",
+                    component: Chat
+                }
             ]
         }
     ]
