@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/Layout/mainLayout.vue'
 import { SingIn, SingUp } from '@/Auth'
+import { ChatView, HomeView } from '@/views'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +18,16 @@ const router = createRouter({
         {
           path: "singin",
           component: SingIn
+        },
+
+        //// Views ////
+        {
+          path: "",
+          component: HomeView
+        },
+        {
+          path: "chats",
+          component: ChatView
         }
       ]
     }
