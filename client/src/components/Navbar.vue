@@ -12,7 +12,7 @@
 
       <!-- Auth Buttons -->
       <div class="nav-auth">
-        <template v-if="isLoggedIn">
+        <template v-if="userStore.token">
           <button class="btn btn-logout" @click="handleLogOut">Log Out</button>
         </template>
         <template v-else>
@@ -33,7 +33,7 @@
     <div class="mobile-menu" :class="{ active: menuOpen }">
       <RouterLink to="/" class="nav-link" @click="menuOpen = false">Home</RouterLink>
       <RouterLink to="/chats" class="nav-link" @click="menuOpen = false">Chats</RouterLink>
-      <template v-if="isLoggedIn">
+      <template v-if="userStore.token">
         <button class="btn btn-logout" @click="handleLogOut">Log Out</button>
       </template>
       <template v-else>
@@ -49,11 +49,12 @@ import api from '@/utils/axios'
 import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const menuOpen = ref(false)
-
-const isLoggedIn = computed(() => !!localStorage.getItem('access_token'))
+const userStore = useUserStore()
+// const isLoggedIn = computed(() => !!localStorage.getItem('access_token'))
 
 async function handleLogOut() {
   try {
@@ -61,7 +62,8 @@ async function handleLogOut() {
     const { data } = await api.post("/auth/logout/", {
       refresh: refresh_token
     })
-    console.log(data)
+    // console.log(data)
+    userStore.token = null
     router.push('/')
     localStorage.clear()
     menuOpen.value = false

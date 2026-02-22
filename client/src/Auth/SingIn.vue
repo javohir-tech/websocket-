@@ -32,8 +32,9 @@ import { RouterLink, useRouter } from 'vue-router'
 import '@/assets/auth.css'
 import api from '@/utils/axios'
 import { toast } from 'vue3-toastify'
+import { useUserStore } from '@/stores/user'
 
-
+const userStore = useUserStore()
 const loading = ref(false)
 const router = useRouter()
 
@@ -51,6 +52,7 @@ async function handleSubmit() {
     localStorage.setItem("email", data.data.email)
     localStorage.setItem('access_token', data.data.tokens.access_token)
     localStorage.setItem('refresh_token', data.data.tokens.refresh_token)
+    userStore.addToken(data.data.tokens.access_token)
     router.push("/")
     // console.log(data)
   } catch (error) {

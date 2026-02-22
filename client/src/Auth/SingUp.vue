@@ -38,6 +38,7 @@ import '@/assets/auth.css'
 import api from '@/utils/axios'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify';
+import { useUserStore } from '@/stores/user'
 
 const form = reactive({
   username: '',
@@ -45,6 +46,7 @@ const form = reactive({
   password: '',
 })
 
+const userStore = useUserStore()
 const router = useRouter()
 const loading = ref(false)
 
@@ -57,7 +59,7 @@ async function handleSubmit() {
     localStorage.setItem("email", data.email)
     localStorage.setItem('access_token', data.tokens.access_token)
     localStorage.setItem('refresh_token', data.tokens.refresh_token)
-
+    userStore.addToken(data.tokens.access_token)
     router.push({ path: "/", query: { registered: true } })
     console.log(data)
   } catch (error) {
