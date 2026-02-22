@@ -45,18 +45,30 @@
 </template>
 
 <script setup>
+import api from '@/utils/axios'
 import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import { toast } from 'vue3-toastify'
 
 const router = useRouter()
 const menuOpen = ref(false)
 
-const isLoggedIn = computed(() => !!localStorage.getItem('accessToken'))
+const isLoggedIn = computed(() => !!localStorage.getItem('access_token'))
 
-function handleLogOut() {
-  localStorage.removeItem('accessToken')
-  menuOpen.value = false
-  router.push('/signin')
+async function handleLogOut() {
+  try {
+    const refresh_token = localStorage.getItem("refresh_token")
+    const { data } = await api.post("/auth/logout/", {
+      refresh: refresh_token
+    })
+    console.log(data)
+    router.push('/')
+    localStorage.clear()
+    menuOpen.value = false
+    toast.success("Log out")
+  } catch (error) {
+    console.log(error.response || error)
+  }
 }
 </script>
 
@@ -186,9 +198,17 @@ function handleLogOut() {
   transition: transform 0.3s, opacity 0.3s;
 }
 
-.burger span.open:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.burger span.open:nth-child(2) { opacity: 0; }
-.burger span.open:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.burger span.open:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.burger span.open:nth-child(2) {
+  opacity: 0;
+}
+
+.burger span.open:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
 
 /* Mobile Menu */
 .mobile-menu {
@@ -205,6 +225,7 @@ function handleLogOut() {
 }
 
 @media (max-width: 640px) {
+
   .nav-links,
   .nav-auth {
     display: none;

@@ -8,5 +8,4 @@
 <script setup>
 import { Navbar } from '@/components';
 
-
 </script>
