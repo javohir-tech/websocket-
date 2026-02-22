@@ -42,7 +42,7 @@ class SingInSerializer(serializers.Serializer):
         user = authenticate(username=username, password=password)
 
         if not user:
-            raise serializers.ValidationError("user topilmadi")
+            raise serializers.ValidationError({"user": "user topilmadi"})
 
         attrs["user"] = user
         return user
