@@ -60,8 +60,8 @@ async function handleSubmit() {
     localStorage.setItem('access_token', data.tokens.access_token)
     localStorage.setItem('refresh_token', data.tokens.refresh_token)
     userStore.addToken(data.tokens.access_token)
-    router.push({ path: "/", query: { registered: true } })
-    console.log(data)
+    router.push("/")
+    // console.log(data)
   } catch (error) {
     if(error.response){
       const data = error.response.data
