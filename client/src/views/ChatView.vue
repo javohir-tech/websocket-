@@ -34,7 +34,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useChat } from '@/composables/useChat'
-import api from '@/utils/axios'
 
 const { message, connect, sendMessage, disconnect } = useChat('general')
 const newMessage = ref('')
