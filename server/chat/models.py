@@ -1,14 +1,23 @@
 from django.db import models
 from users.models import User
 
+
 class Message(models.Model):
-    room = models.CharField(max_length=100)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="sent_messages"
+    )
+    receiver = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="received_messages"
+    )
     content = models.TextField()
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["created_at"]
 
     def __str__(self):
-        return f"{self.room} - {self.author}: {self.content}"
+        return f"{self.sender} -> {self.receiver}: {self.content[:30]}"
 
 
 # Create your models here.

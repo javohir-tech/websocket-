@@ -32,7 +32,7 @@
         <div class="user-info">
           <h3 class="username">{{ user.username }}</h3>
           <p class="email">{{ user.email }}</p>
-          <span class="user-id">#{{ user.id }}</span>
+          <!-- <span class="user-id">#{{ user.id }}</span> -->
         </div>
 
         <div class="chat-btn">
