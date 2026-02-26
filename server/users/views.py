@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 
 # //////////////////////// Serializers ///////////////////////////
-from .serializers import SingUpSerializer, SingInSerializer, LogoutSerialzer
+from .serializers import SingUpSerializer, SingInSerializer, LogoutSerialzer , GetAllUsersSerializer
 
 
 class SingUpView(generics.CreateAPIView):
@@ -61,6 +61,12 @@ class LogoutView(APIView):
         token = RefreshToken(refresh)
         token.blacklist()
         return Response({"success": True, "message": "you are success logout"})
+
+
+class GetAllUsersView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_class = GetAllUsersSerializer
 
 
 # Create your views here.

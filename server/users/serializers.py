@@ -50,3 +50,10 @@ class SingInSerializer(serializers.Serializer):
 
 class LogoutSerialzer(serializers.Serializer):
     refresh = serializers.CharField(required=True)
+    
+class GetAllUsersSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ['id' , 'username' , 'emial']
+    
