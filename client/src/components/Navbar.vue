@@ -8,6 +8,7 @@
       <div class="nav-links">
         <RouterLink to="/" class="nav-link">Home</RouterLink>
         <RouterLink to="/chats" class="nav-link">Chats</RouterLink>
+        <RouterLink to="/users" class="nav-link">users</RouterLink>
       </div>
 
       <!-- Auth Buttons -->
@@ -18,6 +19,7 @@
         <template v-else>
           <RouterLink to="/singup" class="btn btn-outline">Sign Up</RouterLink>
           <RouterLink to="/singin" class="btn btn-primary">Sign In</RouterLink>
+          <RouterLink to="/users" class="nav-link">users</RouterLink> 
         </template>
       </div>
 

@@ -65,7 +65,7 @@ class LogoutView(APIView):
 
 class GetAllUsersView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-created')
     serializer_class = GetAllUsersSerializer
 
 
