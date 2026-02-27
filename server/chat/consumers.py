@@ -91,3 +91,41 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
             for m in message
         ]
+
+
+class UnReadChat(AsyncWebsocketConsumer):
+
+    async def connect(self):
+        self.me = self.scope["user"]
+
+        if self.me.is_anonymous:
+            await self.close()
+            return
+
+        self.room_name = self.me.id
+        self.group_name = f"unread_{self.room_name}"
+
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+        
+        unread_messages = await self.get_unread_chats()
+        
+        for m in unread_messages:
+            await self.send(text_data=json.dumps(m))
+    
+    async def disconnect(self, code):
+        await self.channel_layer.group_discard(self.group_name , self.channel_name)        
+        
+    @database_sync_to_async
+    def get_unread_chats(self):
+        messages = Message.objects.filter(receiver=self.me.id, is_read=False).order_by("created_at")
+
+        return [
+            {
+                "message": m.content,
+                "sender": m.sender.username,
+                "sender_id": str(m.sender.id),
+                "created_at": m.created_at.strftime("%H:%M"),
+            }
+            for m in messages
+        ]
