@@ -6,7 +6,7 @@ const router = useRouter()
 const username = computed(() => localStorage.getItem('username') || 'Foydalanuvchi')
 
 function goToChats() {
-  router.push('/chats')
+  router.push('/users')
 }
 </script>
 

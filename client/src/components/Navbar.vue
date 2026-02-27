@@ -7,7 +7,6 @@
       <!-- Nav Links -->
       <div class="nav-links">
         <RouterLink to="/" class="nav-link">Home</RouterLink>
-        <RouterLink to="/chats" class="nav-link">Chats</RouterLink>
         <RouterLink to="/users" class="nav-link">users</RouterLink>
       </div>
 
@@ -19,7 +18,6 @@
         <template v-else>
           <RouterLink to="/singup" class="btn btn-outline">Sign Up</RouterLink>
           <RouterLink to="/singin" class="btn btn-primary">Sign In</RouterLink>
-          <RouterLink to="/users" class="nav-link">users</RouterLink> 
         </template>
       </div>
 
@@ -34,7 +32,7 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu" :class="{ active: menuOpen }">
       <RouterLink to="/" class="nav-link" @click="menuOpen = false">Home</RouterLink>
-      <RouterLink to="/chats" class="nav-link" @click="menuOpen = false">Chats</RouterLink>
+      <RouterLink to="/users" class="nav-link">users</RouterLink>
       <template v-if="userStore.token">
         <button class="btn btn-logout" @click="handleLogOut">Log Out</button>
       </template>

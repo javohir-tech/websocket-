@@ -66,8 +66,7 @@ function getInitials(name) {
 }
 
 function goToChat(user) {
-//   router.push({ name: 'chat', params: { userId: user.id }, state: { user } });
-    router.push("/chats")
+  router.push({ name: 'chats', params: { userId: user.id }, state: { user } });
 }
 </script>
 

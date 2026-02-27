@@ -8,7 +8,7 @@
 
     <div class="chat-body" ref="bodyRef">
       <transition-group name="msg" tag="div">
-        <div v-for="(msg, i) in message" :key="i" class="msg-row" :class="{ 'msg-row--own': msg.author === 'me' }">
+        <div v-for="(msg, i) in messages" :key="i" class="msg-row" :class="{ 'msg-row--own': msg.author === 'me' }">
           <div class="msg-avatar">{{ msg.author?.[0]?.toUpperCase() ?? '?' }}</div>
           <div class="msg-bubble">
             <span class="msg-author">{{ msg.author }}</span>
@@ -34,10 +34,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useChat } from '@/composables/useChat'
+import { useRoute } from 'vue-router'
 
-const { message, connect, sendMessage, disconnect } = useChat('general')
+const route = useRoute()
+const { messages, connect, sendMessage, disconnect } = useChat(route.params.userId)  // ✅ messages
 const newMessage = ref('')
 const bodyRef = ref(null)
+
+// O'zingizning ID'ingizni saqlang (token'dan yoki store'dan)
+const myId = localStorage.getItem('user_id')  // yoki Pinia store
 
 function send() {
   if (newMessage.value.trim()) {
@@ -48,13 +53,11 @@ function send() {
 
 function scrollToBottom() {
   nextTick(() => {
-    if (bodyRef.value) {
-      bodyRef.value.scrollTop = bodyRef.value.scrollHeight
-    }
+    if (bodyRef.value) bodyRef.value.scrollTop = bodyRef.value.scrollHeight
   })
 }
 
-watch(message, scrollToBottom, { deep: true })
+watch(messages, scrollToBottom, { deep: true })
 
 onMounted(() => {
   connect()

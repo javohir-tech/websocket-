@@ -1,44 +1,59 @@
-import api from "@/utils/axios";
 import { ref } from "vue";
 
-export function useChat(roomName) {
-    const message = ref([])
+export function useChat(userId) {
+    const messages = ref([])
     const ws = ref(null)
+    const isConnected = ref(false)
 
-    async function connect() {
+    function connect() {
         const token = localStorage.getItem('access_token')
-        ws.value = new WebSocket(`ws://localhost:8000/ws/chat/${roomName}/?token=${token}`)
-        try {
-            const { data } = await api.get('http://127.0.0.1:8000/api/chat/general/history/')
-            message.value = data.map((item) => {
-                return { message: item.content, author: item.author }
-            })
-        } catch (error) {
-            console.log(error.reponse || error)
+        
+        if (!token) {
+            console.error("Token topilmadi")
+            return
         }
+
+        if (!userId) {
+            console.error("userId topilmadi")
+            return
+        }
+
+        ws.value = new WebSocket(`ws://localhost:8000/ws/chat/${userId}/?token=${token}`)
+        
         ws.value.onopen = () => {
             console.log("Ulandi")
+            isConnected.value = true
         }
 
         ws.value.onmessage = (e) => {
             const data = JSON.parse(e.data)
-            message.value.push(data)
+            messages.value.push(data)
         }
 
         ws.value.onclose = () => {
             console.log('Uzildi')
+            isConnected.value = false
+        }
+
+        ws.value.onerror = (e) => {
+            console.error("WebSocket xatosi:", e)
         }
     }
 
     function sendMessage(text) {
-        if (ws.value && ws.value.readyState === WebSocket.OPEN) {
-            ws.value.send(JSON.stringify({ message: text }))
+        if (!text?.trim()) return
+
+        if (ws.value?.readyState === WebSocket.OPEN) {
+            ws.value.send(JSON.stringify({ message: text.trim() }))
+        } else {
+            console.warn("WebSocket ulanmagan")
         }
     }
 
     function disconnect() {
         ws.value?.close()
+        ws.value = null
     }
 
-    return { message, connect, sendMessage, disconnect }
+    return { messages, isConnected, connect, sendMessage, disconnect }
 }
