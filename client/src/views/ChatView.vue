@@ -2,16 +2,16 @@
   <div class="chat-wrap">
     <div class="chat-header">
       <span class="chat-dot"></span>
-      <span class="chat-title">general</span>
+      <span class="chat-title">{{ route.params.username }}</span>
       <span class="chat-subtitle">jonli kanal</span>
     </div>
 
     <div class="chat-body" ref="bodyRef">
       <transition-group name="msg" tag="div">
-        <div v-for="(msg, i) in messages" :key="i" class="msg-row" :class="{ 'msg-row--own': msg.author === 'me' }">
-          <div class="msg-avatar">{{ msg.author?.[0]?.toUpperCase() ?? '?' }}</div>
+        <div v-for="(msg, i) in messages" :key="i" class="msg-row" :class="{ 'msg-row--own': msg.sender === me }">
+          <div class="msg-avatar">{{ msg.sender?.[0]?.toUpperCase() ?? '?' }}</div>
           <div class="msg-bubble">
-            <span class="msg-author">{{ msg.author }}</span>
+            <span class="msg-author">{{ msg.sender }}</span>
             <p class="msg-text">{{ msg.message }}</p>
           </div>
         </div>
@@ -37,12 +37,11 @@ import { useChat } from '@/composables/useChat'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const { messages, connect, sendMessage, disconnect } = useChat(route.params.userId)  // ✅ messages
+const { messages, connect, sendMessage, disconnect } = useChat(route.params.userId)  
 const newMessage = ref('')
 const bodyRef = ref(null)
 
-// O'zingizning ID'ingizni saqlang (token'dan yoki store'dan)
-const myId = localStorage.getItem('user_id')  // yoki Pinia store
+const me = localStorage.getItem("username")
 
 function send() {
   if (newMessage.value.trim()) {
