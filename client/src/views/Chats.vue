@@ -1,8 +1,9 @@
 <template>
-    <div class="chats" v-for="chat in chatStore.unread_messages" @click="handleNavigateChat(chat)">
-        <p>{{ chat.sender }}</p>
-        <p>{{ chat.message }}</p>
-        <p>{{ chat.created_at }}</p>
+    <div class="chats" v-for="chat in chatStore.unread_messages" @click="handleNavigateChat(chat[chat.length-1])">
+        <p>{{ chat.length }}</p>
+        <p>{{ chat[chat.length-1].sender }}</p>
+        <p>{{ chat[chat.length-1].message }}</p>
+        <p>{{ chat[chat.length-1].created_at }}</p>
     </div>
 </template>
 

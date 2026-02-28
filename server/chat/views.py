@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Message
 from .serializers import ChatSerializer
@@ -14,5 +15,8 @@ class ChatView(APIView):
         serializer = ChatSerializer(messages, many=True)
         return Response(serializer.data)
 
-
-# Create your views here.
+class ChatWithUser(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChatSerializer()
+    def get_queryset(self):
+        return Message.objects.filter(receiver = self.user)
