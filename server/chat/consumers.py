@@ -35,6 +35,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         msg = await self.save_massage(content)
+        await self.mark_unread_as_read()
 
         await self.channel_layer.group_send(
             self.group_name,
@@ -93,10 +94,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             .order_by("created_at")[:50]
         )
 
-        for msg in messages:
-            if msg.is_read == False:
-                msg.is_read = True
-                msg.save()
+        Message.objects.filter(receiver=self.me.id, is_read=False).update(is_read=True)
 
         return [
             {
@@ -107,6 +105,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
             for m in messages
         ]
+
+    @database_sync_to_async
+    def mark_unread_as_read(self):
+        Message.objects.filter(receiver=self.me.id, is_read=False).update(is_read=True)
 
 
 class UnReadChat(AsyncWebsocketConsumer):

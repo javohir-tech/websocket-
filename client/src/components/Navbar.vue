@@ -8,6 +8,7 @@
       <div class="nav-links">
         <RouterLink to="/" class="nav-link">Home</RouterLink>
         <RouterLink to="/users" class="nav-link">users</RouterLink>
+        <RouterLink to="/chats" class="nav-link">chats {{ chatsStore.unReadCount }}</RouterLink>
       </div>
 
       <!-- Auth Buttons -->
@@ -33,6 +34,7 @@
     <div class="mobile-menu" :class="{ active: menuOpen }">
       <RouterLink to="/" class="nav-link" @click="menuOpen = false">Home</RouterLink>
       <RouterLink to="/users" class="nav-link">users</RouterLink>
+      <RouterLink to="/chats" class="nav-link">chats</RouterLink>
       <template v-if="userStore.token">
         <button class="btn btn-logout" @click="handleLogOut">Log Out</button>
       </template>
@@ -50,7 +52,9 @@ import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import { useUserStore } from '@/stores/user'
+import { useChatStore } from '@/stores/massages'
 
+const chatsStore = useChatStore()
 const router = useRouter()
 const menuOpen = ref(false)
 const userStore = useUserStore()

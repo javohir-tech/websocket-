@@ -6,6 +6,9 @@ export const useChatStore = defineStore('chat', {
             unread_messages: []
         }
     ),
+    getters: {
+        unReadCount: (state) =>  state.unread_messages.length
+    },
 
     actions: {
         on_message(data) {

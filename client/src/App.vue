@@ -18,9 +18,6 @@ watch(()=>chatStore.unread_messages, (newVal) => {
 </script>
 
 <template>
-  <div>
-    <h1>{{ chatStore.unread_messages.length }}</h1>
-  </div>
   <RouterView />
 </template>
 
