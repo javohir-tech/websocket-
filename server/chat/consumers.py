@@ -73,7 +73,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_chat_history(self):
-        message = (
+        messages = (
             Message.objects.filter(
                 sender_id__in=[self.me.id, self.target_id],
                 receiver_id__in=[self.me.id, self.target_id],
@@ -81,6 +81,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             .select_related("sender")
             .order_by("created_at")[:50]
         )
+        
+        for msg in messages :
+            if msg.is_read == False:
+                msg.is_read = True
+                msg.save()
 
         return [
             {
@@ -89,7 +94,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "sender_id": str(m.sender_id),
                 "created_at": m.created_at.strftime("%H:%M"),
             }
-            for m in message
+            for m in messages
         ]
 
 
