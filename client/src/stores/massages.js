@@ -1,13 +1,15 @@
 import { defineStore } from "pinia";
 
-export const useChatStore = defineStore('chat', () => {
-    state : ()=>(
+export const useChatStore = defineStore('chat', {
+    state: () => (
         {
-            unread_messages : []
+            unread_messages: []
         }
-    )
+    ),
 
-    actions : {
-        
+    actions: {
+        on_message(data) {
+            this.unread_messages.push(data)
+        }
     }
 })

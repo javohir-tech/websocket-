@@ -1,9 +1,12 @@
 import { ref } from "vue";
+import { useChatStore } from "@/stores/massages";
+
+const messages = ref([])
+const ws = ref(null)
+const isConnected = ref(false)
 
 export function UnReadChats() {
-    const messages = ref([])
-    const ws = ref(null)
-    const isConnected = ref(false)
+    const chatStore = useChatStore()
 
     function connect() {
         const token = localStorage.getItem("access_token")
@@ -22,7 +25,7 @@ export function UnReadChats() {
 
         ws.value.onmessage = (e) => {
             const data = JSON.parse(e.data)
-            messages.value.push(data)
+            chatStore.on_message(data)
         }
 
         ws.value.onclose = () => {
@@ -31,5 +34,5 @@ export function UnReadChats() {
         }
     }
 
-    return {messages , isConnected , connect}
+    return { messages, isConnected, connect }
 }
