@@ -3,7 +3,6 @@ from channels.db import database_sync_to_async
 from .models import Message
 import json
 
-
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.me = self.scope["user"]
@@ -18,11 +17,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
-
-        messages = await self.get_chat_history()
-
-        for msg in messages:
-            await self.send(text_data=json.dumps(msg))
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
@@ -55,6 +49,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "message": content,
                 "sender": self.me.username,
                 "sender_id": str(self.me.id),
+                "is_read": msg.is_read,
                 "created_at": msg.created_at.strftime("%H:%M"),
             },
         )
@@ -82,29 +77,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return Message.objects.create(
             sender_id=self.me.id, receiver_id=self.target_id, content=content
         )
-
-    @database_sync_to_async
-    def get_chat_history(self):
-        messages = (
-            Message.objects.filter(
-                sender_id__in=[self.me.id, self.target_id],
-                receiver_id__in=[self.me.id, self.target_id],
-            )
-            .select_related("sender")
-            .order_by("created_at")[:50]
-        )
-
-        Message.objects.filter(receiver=self.me.id, is_read=False).update(is_read=True)
-
-        return [
-            {
-                "message": m.content,
-                "sender": m.sender.username,
-                "sender_id": str(m.sender_id),
-                "created_at": m.created_at.strftime("%H:%M"),
-            }
-            for m in messages
-        ]
+    
 
     @database_sync_to_async
     def mark_unread_as_read(self):
@@ -141,6 +114,7 @@ class UnReadChat(AsyncWebsocketConsumer):
                     "message": event["message"],
                     "sender": event["sender"],
                     "sender_id": event["sender_id"],
+                    "is_read": event["is_read"],
                     "created_at": event["created_at"],
                 }
             )
@@ -148,15 +122,14 @@ class UnReadChat(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_unread_chats(self):
-        messages = Message.objects.filter(receiver=self.me.id, is_read=False).order_by(
-            "created_at"
-        )
+        messages = Message.objects.filter(receiver=self.me.id , is_read = False).order_by("created_at")
 
         return [
             {
                 "message": m.content,
                 "sender": m.sender.username,
                 "sender_id": str(m.sender.id),
+                "is_read": m.is_read,
                 "created_at": m.created_at.strftime("%H:%M"),
             }
             for m in messages

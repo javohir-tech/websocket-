@@ -35,18 +35,19 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useChat } from '@/composables/useChat'
 import { useRoute } from 'vue-router'
+import { useFetch } from '@/Hooks/useFetch'
 
 const route = useRoute()
-const { messages, connect, sendMessage, disconnect } = useChat(route.params.userId)  
+const { messages, connect, sendMessage, disconnect } = useChat(route.params.userId)
 const newMessage = ref('')
 const bodyRef = ref(null)
+const { getData, data, loading, err } = useFetch()
 
 const me = localStorage.getItem("username")
-
 function send() {
   if (newMessage.value.trim()) {
     sendMessage(newMessage.value)
-    newMessage.value = ''
+    newMessage.value = ""
   }
 }
 
@@ -56,10 +57,22 @@ function scrollToBottom() {
   })
 }
 
+async function getChatHistory() {
+  await getData(`/api/chat/${route.params.userId}/history/`)
+  messages.value = data.value.map((item) => {
+    return {
+      sender : item.sender,
+      receiver : item.receiver,
+      message : item.content,
+    }
+  })
+}
+
 watch(messages, scrollToBottom, { deep: true })
 
 onMounted(() => {
   connect()
+  getChatHistory()
   scrollToBottom()
 })
 onUnmounted(() => disconnect())

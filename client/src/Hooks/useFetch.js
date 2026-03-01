@@ -13,7 +13,6 @@ export function useFetch() {
         try {
             const response = await api.get(url)
             data.value = response.data
-            // console.log(data.value)
         } catch (error) {
             err.value = error.response || error
         } finally {

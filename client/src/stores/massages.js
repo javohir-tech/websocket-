@@ -13,7 +13,6 @@ export const useChatStore = defineStore('chat', {
     actions: {
         on_message(data) {
             const sender = data.sender
-            console.log(sender)
             if (!this.unread_messages[sender]) {
                 this.unread_messages[sender] = [data]
             } else {

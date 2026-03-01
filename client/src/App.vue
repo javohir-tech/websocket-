@@ -9,12 +9,8 @@ const { messages, isConnected, connect } = UnReadChats()
 
 onMounted(() => {
   connect()
-  console.log(messages.value)
 })
 
-watch(()=>chatStore.unread_messages, (newVal) => {
-  console.log(newVal)
-} , {deep : true})
 </script>
 
 <template>
