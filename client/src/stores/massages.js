@@ -3,21 +3,16 @@ import { defineStore } from "pinia";
 export const useChatStore = defineStore('chat', {
     state: () => (
         {
-            unread_messages: {}
+            message: []
         }
     ),
     getters: {
-        unReadCount: (state) => Object.keys(state.unread_messages).length
+        unReadCount: (state) => state.message.length ?? 0
     },
-
+    
     actions: {
         on_message(data) {
-            const sender = data.sender
-            if (!this.unread_messages[sender]) {
-                this.unread_messages[sender] = [data]
-            } else {
-                this.unread_messages[sender].push(data)
-            }
+            this.message = data
         }
     }
 })

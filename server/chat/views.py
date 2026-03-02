@@ -94,7 +94,7 @@ class ConversationListView(APIView):
                     "partner": partner.username,
                     "partner_id": partner_id,
                     "last_message": last_msg.content,
-                    "last_": last_msg.created_at.isoformat(),
+                    "last_message_time": last_msg.created_at.isoformat(),
                     "unread_count": unread_count.get(partner_id, 0),
                     "last_message_me": last_msg.sender == me,
                 }

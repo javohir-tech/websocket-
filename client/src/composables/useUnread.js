@@ -25,6 +25,7 @@ export function UnReadChats() {
 
         ws.value.onmessage = (e) => {
             const data = JSON.parse(e.data)
+            console.log(data)
             chatStore.on_message(data)
         }
 

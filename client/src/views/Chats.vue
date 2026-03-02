@@ -7,20 +7,16 @@
 
     <div class="search-bar">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
       </svg>
       <input type="text" v-model="searchQuery" placeholder="Search conversations..." class="search-input" />
     </div>
 
     <div class="chat-list">
       <transition-group name="chat-item">
-        <div
-          v-for="(chat, index) in filteredChats"
-          :key="chat.partner_id"
-          class="chat-item"
-          :style="{ animationDelay: `${index * 0.05}s` }"
-          @click="chatTo(chat.partner_id, chat.partner)"
-        >
+        <div v-for="(chat, index) in filteredChats" :key="chat.partner_id" class="chat-item"
+          :style="{ animationDelay: `${index * 0.05}s` }" @click="chatTo(chat.partner_id, chat.partner)">
           <div class="avatar">
             <span class="avatar-letter">{{ chat.partner.charAt(0).toUpperCase() }}</span>
             <span class="online-dot"></span>
@@ -33,8 +29,9 @@
             </div>
             <div class="chat-bottom">
               <span class="last-message">
-                <svg v-if="chat.last_message_me" class="sent-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="20 6 9 17 4 12"/>
+                <svg v-if="chat.last_message_me" class="sent-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12" />
                 </svg>
                 {{ chat.last_message }}
               </span>
@@ -58,7 +55,7 @@
 
       <div v-if="!loading && filteredChats.length === 0" class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
         <p>No conversations yet</p>
       </div>
@@ -70,14 +67,23 @@
 import { useFetch } from '@/Hooks/useFetch';
 import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useChatStore } from '@/stores/massages';
 
+const chatStore = useChatStore()
 const router = useRouter();
 const { getData, data, loading, err } = useFetch();
 const searchQuery = ref('');
 
+const chats = computed(() => {
+  if (!chatStore.message) return data.value
+  const partner_id = chatStore.message.partner_id
+  console.log(partner_id)
+  return data.value
+})
+
 const filteredChats = computed(() => {
-  if (!data.value) return [];
-  return data.value.filter(chat =>
+  if (!chats.value) return [];
+  return chats.value.filter(chat =>
     chat.partner.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
     chat.last_message.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
@@ -105,6 +111,7 @@ const chatTo = (userId, user) => {
   router.push({ name: 'chats', params: { userId, username: user } });
 };
 
+
 onMounted(() => {
   getData('/api/chats/');
 });
@@ -113,7 +120,9 @@ onMounted(() => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 .chat-container {
   font-family: 'Sora', sans-serif;
@@ -181,11 +190,19 @@ onMounted(() => {
   transition: border-color 0.2s;
 }
 
-.search-input::placeholder { color: #555b7a; }
-.search-input:focus { border-color: #5b6cff; }
+.search-input::placeholder {
+  color: #555b7a;
+}
+
+.search-input:focus {
+  border-color: #5b6cff;
+}
 
 /* Chat List */
-.chat-list { padding: 0 8px; flex: 1; }
+.chat-list {
+  padding: 0 8px;
+  flex: 1;
+}
 
 .chat-item {
   display: flex;
@@ -199,12 +216,25 @@ onMounted(() => {
   margin-bottom: 2px;
 }
 
-.chat-item:hover { background: #181a24; }
-.chat-item:active { background: #1e2030; transform: scale(0.99); }
+.chat-item:hover {
+  background: #181a24;
+}
+
+.chat-item:active {
+  background: #1e2030;
+  transform: scale(0.99);
+}
 
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Avatar */
@@ -310,7 +340,9 @@ onMounted(() => {
 }
 
 /* Skeleton */
-.skeleton-list { padding: 8px 4px; }
+.skeleton-list {
+  padding: 8px 4px;
+}
 
 .skeleton-item {
   display: flex;
@@ -329,7 +361,12 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.skeleton-content { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 .skeleton-line {
   height: 12px;
@@ -337,12 +374,25 @@ onMounted(() => {
   background: #181a24;
   animation: shimmer 1.4s infinite;
 }
-.skeleton-line.short { width: 40%; }
-.skeleton-line.long  { width: 75%; }
+
+.skeleton-line.short {
+  width: 40%;
+}
+
+.skeleton-line.long {
+  width: 75%;
+}
 
 @keyframes shimmer {
-  0%, 100% { opacity: 0.4; }
-  50%       { opacity: 0.8; }
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
 }
 
 /* Empty State */
@@ -356,12 +406,32 @@ onMounted(() => {
   gap: 14px;
 }
 
-.empty-state svg { width: 48px; height: 48px; }
-.empty-state p { font-size: 15px; margin: 0; }
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+}
+
+.empty-state p {
+  font-size: 15px;
+  margin: 0;
+}
 
 /* Transition */
-.chat-item-enter-active { transition: all 0.3s ease; }
-.chat-item-leave-active { transition: all 0.2s ease; }
-.chat-item-enter-from  { opacity: 0; transform: translateX(-20px); }
-.chat-item-leave-to    { opacity: 0; transform: translateX(20px); }
+.chat-item-enter-active {
+  transition: all 0.3s ease;
+}
+
+.chat-item-leave-active {
+  transition: all 0.2s ease;
+}
+
+.chat-item-enter-from {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.chat-item-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
 </style>

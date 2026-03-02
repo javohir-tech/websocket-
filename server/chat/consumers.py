@@ -2,6 +2,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import Message
 import json
+from django.db.models import Q
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -18,6 +20,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
 
+        await self.mark_unread_as_read()
+
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
@@ -29,7 +33,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         msg = await self.save_massage(content)
-        await self.mark_unread_as_read()
 
         await self.channel_layer.group_send(
             self.group_name,
@@ -50,7 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "sender": self.me.username,
                 "sender_id": str(self.me.id),
                 "is_read": msg.is_read,
-                "created_at": msg.created_at.strftime("%H:%M"),
+                "created_at": msg.created_at.isoformat(),
             },
         )
 
@@ -77,7 +80,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return Message.objects.create(
             sender_id=self.me.id, receiver_id=self.target_id, content=content
         )
-    
 
     @database_sync_to_async
     def mark_unread_as_read(self):
@@ -99,38 +101,59 @@ class UnReadChat(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
 
-        unread_messages = await self.get_unread_chats()
-
-        for m in unread_messages:
-            await self.send(text_data=json.dumps(m))
+        self.known_partner_ids = await self.get_known_partner_ids()
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def send_unread(self, event):
+        sender_id = event["sender_id"]
+        is_new_partner = sender_id not in self.known_partner_ids
+
+        if is_new_partner:
+            self.known_partner_ids.add(sender_id)
+
         await self.send(
             text_data=json.dumps(
                 {
-                    "message": event["message"],
-                    "sender": event["sender"],
-                    "sender_id": event["sender_id"],
+                    "last_message": event["message"],
+                    "partner": event["sender"],
+                    "partner_id": event["sender_id"],
                     "is_read": event["is_read"],
-                    "created_at": event["created_at"],
+                    "last_message_time": event["created_at"],
+                    "is_new_partner": is_new_partner,
                 }
             )
         )
 
     @database_sync_to_async
+    def get_known_partner_ids(self):
+        messages = Message.objects.filter(
+            Q(sender=self.me) | Q(receiver=self.me)
+        ).values_list("sender_id", "receiver_id")
+
+        ids = set()
+
+        for sender_id, reveiver_id in messages:
+            ids.add(sender_id)
+            ids.add(reveiver_id)
+        ids.discard(self.me.id)
+        return ids
+
+    @database_sync_to_async
     def get_unread_chats(self):
-        messages = Message.objects.filter(receiver=self.me.id , is_read = False).order_by("created_at")
+        messages = Message.objects.filter(receiver=self.me.id, is_read=False).order_by(
+            "created_at"
+        )
 
         return [
             {
-                "message": m.content,
-                "sender": m.sender.username,
-                "sender_id": str(m.sender.id),
+                "last_message": m.content,
+                "partner": m.sender.username,
+                "partner_id": str(m.sender.id),
                 "is_read": m.is_read,
-                "created_at": m.created_at.strftime("%H:%M"),
+                "last_message_time": m.created_at.strftime("%H:%M"),
+                "is_new_partner": False,
             }
             for m in messages
         ]
