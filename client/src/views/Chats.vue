@@ -77,8 +77,16 @@ const searchQuery = ref('');
 const chats = computed(() => {
   if (!chatStore.message) return data.value
   const partner_id = chatStore.message.partner_id
-  console.log(partner_id)
-  return data.value
+  const selected = data.value.find(pid => pid.partner_id === partner_id)
+
+  if (!selected) return data.value
+  
+  return [
+    selected,
+    ...data.value.filter(
+      item => item.partner_id !== partner_id
+    )
+  ]
 })
 
 const filteredChats = computed(() => {

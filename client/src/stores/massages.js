@@ -3,13 +3,13 @@ import { defineStore } from "pinia";
 export const useChatStore = defineStore('chat', {
     state: () => (
         {
-            message: []
+            message: null
         }
     ),
     getters: {
-        unReadCount: (state) => state.message.length ?? 0
+        unReadCount: (state) => 0
     },
-    
+
     actions: {
         on_message(data) {
             this.message = data

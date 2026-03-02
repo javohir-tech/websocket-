@@ -83,7 +83,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def mark_unread_as_read(self):
-        Message.objects.filter(receiver=self.me.id, is_read=False).update(is_read=True)
+        Message.objects.filter(receiver=self.me.id, sender_id = self.target_id, is_read=False).update(is_read=True)
 
 
 class UnReadChat(AsyncWebsocketConsumer):
@@ -140,20 +140,3 @@ class UnReadChat(AsyncWebsocketConsumer):
         ids.discard(self.me.id)
         return ids
 
-    @database_sync_to_async
-    def get_unread_chats(self):
-        messages = Message.objects.filter(receiver=self.me.id, is_read=False).order_by(
-            "created_at"
-        )
-
-        return [
-            {
-                "last_message": m.content,
-                "partner": m.sender.username,
-                "partner_id": str(m.sender.id),
-                "is_read": m.is_read,
-                "last_message_time": m.created_at.strftime("%H:%M"),
-                "is_new_partner": False,
-            }
-            for m in messages
-        ]
