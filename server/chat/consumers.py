@@ -135,8 +135,8 @@ class UnReadChat(AsyncWebsocketConsumer):
         ids = set()
 
         for sender_id, reveiver_id in messages:
-            ids.add(sender_id)
-            ids.add(reveiver_id)
-        ids.discard(self.me.id)
+            ids.add(str(sender_id))
+            ids.add(str(reveiver_id))
+        ids.discard(str(self.me.id))
         return ids
 
