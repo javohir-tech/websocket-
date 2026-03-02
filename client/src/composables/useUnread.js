@@ -26,7 +26,11 @@ export function UnReadChats() {
         ws.value.onmessage = (e) => {
             const data = JSON.parse(e.data)
             console.log(data)
-            chatStore.on_message(data)
+            if (data.is_new_partner) {
+                chatStore.on_message({ ...data, unread_count: 1 })
+            }else{
+                chatStore.on_message(data)
+            }
         }
 
         ws.value.onclose = () => {

@@ -65,7 +65,7 @@
 
 <script setup>
 import { useFetch } from '@/Hooks/useFetch';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useChatStore } from '@/stores/massages';
 
@@ -74,24 +74,31 @@ const router = useRouter();
 const { getData, data, loading, err } = useFetch();
 const searchQuery = ref('');
 
-const chats = computed(() => {
-  if (!chatStore.message) return data.value
-  const partner_id = chatStore.message.partner_id
-  const selected = data.value.find(pid => pid.partner_id === partner_id)
+watch(() => chatStore.message, (message) => {
+  if (!message) return
 
-  if (!selected) return data.value
-  
-  return [
-    selected,
-    ...data.value.filter(
-      item => item.partner_id !== partner_id
-    )
-  ]
-})
+  if (message.is_new_partner) {
+    data.value.unshift(message)
+    return 
+  }
+
+  const chat = data.value.find(pid => pid.partner_id === message.partner_id)
+
+  if (chat) {
+    chat.last_message = message.last_message
+    chat.unread_count++
+  }
+
+  const pid_index = data.value.findIndex(pid => pid.partner_id === message.partner_id)
+  if (pid_index > -1) {
+    const item = data.value.splice(pid_index, 1)[0]
+    data.value.unshift(item)
+  }
+}, { deep: true })
 
 const filteredChats = computed(() => {
-  if (!chats.value) return [];
-  return chats.value.filter(chat =>
+  if (!data.value) return [];
+  return data.value.filter(chat =>
     chat.partner.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
     chat.last_message.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
